@@ -1,0 +1,41 @@
+services:
+  app:
+    image: php:8.2-fpm
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-backend
+    working_dir: /var/www
+    volumes:
+      - ./laravel:/var/www
+      - ./php.ini:/usr/local/etc/php/php.ini
+    networks:
+      - laravel
+
+  webserver:
+    image: nginx:latest
+    container_name: laravel-web-backend
+    ports:
+      - "8000:80"
+    volumes:
+      - ./laravel:/var/www
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - laravel
+
+  mysql:
+    image: mysql:8
+    container_name: laravel-db
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_DATABASE: laravelBackend
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - laravel
+
+networks:
+  laravel:
+    driver: bridge
