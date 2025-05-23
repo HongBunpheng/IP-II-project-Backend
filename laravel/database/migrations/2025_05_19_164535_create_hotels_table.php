@@ -14,8 +14,16 @@ return new class extends Migration
         Schema::create('hotels', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-      // secondary image
-            $table->timestamps();                        // created_at & updated_at
+            $table->string('promotion');
+            $table->string('location');
+            $table->string('address');
+            $table->string('contact');
+            $table->decimal('rating', 3, 2)->default(0);
+            $table->decimal('price', 10, 2);
+            $table->text('details');
+            $table->json('image')->nullable();
+            $table->json('detail_image')->nullable();
+            $table->timestamps();
         });
     }
 

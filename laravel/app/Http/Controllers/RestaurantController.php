@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Hotel;
+use App\Models\Restaurant;
 use Illuminate\Http\Request;
 
-class HotelController extends Controller
+class RestaurantController extends Controller
 {
     public function index()
     {
-        return response()->json(Hotel::all(), 200);
+        return response()->json(Restaurant::all(), 200);
     }
 
     public function store(Request $request)
@@ -27,7 +27,7 @@ class HotelController extends Controller
             'detail_image.*' => 'nullable|image',
         ]);
 
-        $hotel = new Hotel($request->except(['image', 'detail_image']));
+        $hotel = new Restaurant($request->except(['image', 'detail_image']));
 
         // Handle image array
         $imagePaths = [];
@@ -52,12 +52,12 @@ class HotelController extends Controller
         return response()->json(['message' => 'Hotel saved', 'hotel' => $hotel], 201);
     }
 
-    public function show(Hotel $hotel)
+    public function show(Restaurant $hotel)
     {
         return response()->json($hotel);
     }
 
-    public function update(Request $request, Hotel $hotel)
+    public function update(Request $request, Restaurant $hotel)
     {
         $request->validate([
             'image.*' => 'nullable|image',
@@ -89,7 +89,7 @@ class HotelController extends Controller
         return response()->json($hotel);
     }
 
-    public function destroy(Hotel $hotel)
+    public function destroy(Restaurant $hotel)
     {
         $hotel->delete();
         return response()->json(null, 204);

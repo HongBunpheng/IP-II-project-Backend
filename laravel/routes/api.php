@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthenController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HotelController;
+use App\Http\Controllers\RestaurantController;
 
 Route::controller(HotelController::class)->prefix('hotels')->group(function () {
     Route::get('/', 'index');
@@ -11,6 +12,14 @@ Route::controller(HotelController::class)->prefix('hotels')->group(function () {
     Route::get('/{hotel}', 'show');
     Route::put('/{hotel}', 'update');
     Route::delete('/{hotel}', 'destroy');
+});
+
+Route::controller(RestaurantController::class)->prefix('Restaurants')->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+    Route::get('/{restaurant}', 'show');
+    Route::put('/{restaurant}', 'update');
+    Route::delete('/{restaurant}', 'destroy');
 });
 
 Route::controller(AccountController::class)->prefix('accounts')->group(function () {
