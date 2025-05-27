@@ -14,7 +14,7 @@ Route::controller(HotelController::class)->prefix('hotels')->group(function () {
     Route::delete('/{hotel}', 'destroy');
 });
 
-Route::controller(RestaurantController::class)->prefix('Restaurants')->group(function () {
+Route::controller(RestaurantController::class)->prefix('restaurants')->group(function () {
     Route::get('/', 'index');
     Route::post('/', 'store');
     Route::get('/{restaurant}', 'show');
