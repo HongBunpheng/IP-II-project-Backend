@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\AuthenController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\RestaurantController;
@@ -30,9 +29,11 @@ Route::controller(AccountController::class)->prefix('accounts')->group(function 
     Route::delete('/{account}', 'destroy');
 });
 
-Route::post('/register', [AuthenController::class, 'register']);
-Route::post('/login', [AuthenController::class, 'login']);
-Route::post('/forgot-password', [AuthenController::class, 'forgotPassword']);
-Route::post('/verify-code', [AuthenController::class, 'verifyCode']); // optional
-Route::post('/reset-password', [AuthenController::class, 'resetPassword']);
+Route::post('/register', [AccountController::class, 'store']);
+Route::post('/login', [AccountController::class, 'login']);
+Route::post('/forgot-password', [AccountController::class, 'sendResetCode']);
+Route::post('/verify-code', [AccountController::class, 'verifyResetCode']);
+Route::post('/reset-password', [AccountController::class, 'resetPassword']);
+
+
 

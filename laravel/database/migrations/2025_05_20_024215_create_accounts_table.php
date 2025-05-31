@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name'); // Name of the account holder
             $table->string('email')->unique(); // Unique email for the account
             $table->string('password'); // Password for the account
+            $table->string('reset_code')->nullable();
+            $table->timestamp('reset_code_expires_at')->nullable();
             $table->timestamps();
         });
     }
