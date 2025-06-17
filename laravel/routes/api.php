@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\JournalController;
 
 Route::controller(HotelController::class)->prefix('hotels')->group(function () {
     Route::get('/', 'index');
@@ -35,5 +36,8 @@ Route::post('/forgot-password', [AccountController::class, 'sendResetCode']);
 Route::post('/verify-code', [AccountController::class, 'verifyResetCode']);
 Route::post('/reset-password', [AccountController::class, 'resetPassword']);
 
+Route::get('/journals', [JournalController::class, 'index']);
+Route::post('/journals', [JournalController::class, 'store']);
+Route::get('/journals/{id}', [JournalController::class, 'show']);
 
 
