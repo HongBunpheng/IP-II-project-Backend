@@ -16,7 +16,8 @@ class Journal extends Model
         'mentions' => 'array',
     ];
 
-    public function user() {
-        return $this->belongsTo(User::class);
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
     }
 }

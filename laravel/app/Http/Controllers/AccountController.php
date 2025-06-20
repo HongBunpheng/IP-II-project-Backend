@@ -8,13 +8,11 @@ use Illuminate\Support\Facades\Hash;
 
 class AccountController extends Controller
 {
-    // List all accounts
     public function index()
     {
         return response()->json(Account::all(), 200);
     }
 
-    // Store a new account (Registration)
     public function store(Request $request)
     {
         $request->validate([
@@ -27,31 +25,47 @@ class AccountController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'phone' => null,
+            'dob' => null,
+            'address' => null,
+            'profile_picture' => '',
+            'featured_picture' => [],
+            'social_links' => [],
+            'bio' => '',
+            'nickname' => '',
         ]);
+
+        $token = $account->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Account created successfully',
-            'data' => $account
+            'token' => $token,
+            'account' => $account
         ], 201);
     }
 
-    // Show a single account
     public function show(Account $account)
     {
         return response()->json($account, 200);
     }
 
-    // Update an account
     public function update(Request $request, Account $account)
     {
         $request->validate([
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:accounts,email,' . $account->id,
             'password' => 'sometimes|string|min:6',
+            'phone' => 'nullable|string',
+            'dob' => 'nullable|date',
+            'address' => 'nullable|string',
+            'profile_picture' => 'nullable|string',
+            'featured_picture' => 'nullable|array',
+            'social_links' => 'nullable|array',
+            'bio' => 'nullable|string',
+            'nickname' => 'nullable|string',
         ]);
 
         $data = $request->all();
-
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
@@ -64,15 +78,12 @@ class AccountController extends Controller
         ]);
     }
 
-    // Delete an account
     public function destroy(Account $account)
     {
         $account->delete();
-
         return response()->json(['message' => 'Account deleted'], 204);
     }
 
-    // ✅ Login method
     public function login(Request $request)
     {
         $request->validate([
@@ -84,15 +95,16 @@ class AccountController extends Controller
 
         if (!$account || !Hash::check($request->password, $account->password)) {
             return response()->json([
-                'message' => [
-                    'email' => 'Invalid email or password'
-                ]
+                'message' => ['email' => 'Invalid email or password']
             ], 401);
         }
 
+        $token = $account->createToken('auth_token')->plainTextToken;
+
         return response()->json([
-            'message' => 'Login successful!',
-            'user' => $account
+            'message' => 'Login successful',
+            'token' => $token,
+            'account' => $account
         ]);
     }
 
@@ -105,14 +117,14 @@ class AccountController extends Controller
             return response()->json(['message' => 'Email not found'], 404);
         }
 
-        $code = rand(100000, 999999); // 6-digit code
+        $code = rand(100000, 999999);
         $account->reset_code = $code;
         $account->reset_code_expires_at = now()->addMinutes(10);
         $account->save();
 
-        // For real apps, send via email
-        return response()->json(['message' => 'Verification code sent', 'code' => $code]); // Show code for dev
+        return response()->json(['message' => 'Verification code sent', 'code' => $code]);
     }
+
     public function verifyResetCode(Request $request)
     {
         $request->validate([
@@ -155,5 +167,90 @@ class AccountController extends Controller
         $account->save();
 
         return response()->json(['message' => 'Password reset successfully']);
+    }
+
+    // ✅ Get current logged-in user
+    public function profile(Request $request)
+    {
+        return response()->json($request->user());
+    }
+
+    // ✅ Update current user's profile
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $data = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'nickname' => 'nullable|string|max:255',
+            'bio' => 'nullable|string',
+            'address' => 'nullable|string',
+            'social_links' => 'nullable|array',
+            'featured_picture' => 'nullable|array',
+            'profile_picture' => 'nullable|string',
+        ]);
+
+        $user->update($data);
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'account' => $user
+        ]);
+    }
+
+    // ✅ Handle profile image upload
+    public function uploadImage(Request $request)
+    {
+        $user = $request->user();
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->store('uploads', 'public'); // ✅ same as your existing usage
+
+            $user->profile_picture = '/storage/' . $path;
+            $user->save();
+
+            return response()->json([
+                'message' => 'Profile picture updated',
+                'profile_picture' => $user->profile_picture
+            ]);
+        }
+
+        return response()->json(['message' => 'No image uploaded'], 400);
+    }
+
+    // ✅ Handle featured photo upload
+    public function uploadFeaturedPhoto(Request $request)
+    {
+        $user = $request->user();
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->store('uploads', 'public'); // ✅ consistent with your detail image logic
+
+            $url = '/storage/' . $path;
+
+            $current = $user->featured_picture ?? [];
+            $current[] = $url;
+
+            $user->featured_picture = $current;
+            $user->save();
+
+            return response()->json([
+                'message' => 'Featured photo added',
+                'path' => $url
+            ]);
+        }
+
+        return response()->json(['message' => 'No image uploaded'], 400);
+    }
+
+    // ✅ Delete current user account
+    public function deleteProfile(Request $request)
+    {
+        $user = $request->user();
+        $user->delete();
+
+        return response()->json(['message' => 'Your account has been deleted.']);
     }
 }

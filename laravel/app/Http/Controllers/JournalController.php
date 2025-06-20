@@ -10,7 +10,25 @@ class JournalController extends Controller
 {
     public function index()
     {
-        return response()->json(Journal::latest()->get(), 200);
+        $journals = Journal::with('account')->latest()->get()->map(function ($journal) {
+            return [
+                'id' => $journal->id,
+                'title' => $journal->title,
+                'content' => $journal->content,
+                'location' => $journal->location,
+                'images' => json_decode($journal->images, true),
+                'mentions' => json_decode($journal->mentions, true),
+                'read_time' => $journal->read_time,
+                'created_at' => $journal->created_at,
+                'author_name' => optional($journal->account)->name,
+                'author_avatar' => $journal->account && $journal->account->profile_picture
+                    ? '' . ltrim($journal->account->profile_picture, '/')
+                    : null,
+
+            ];
+        });
+
+        return response()->json($journals, 200);
     }
 
 
@@ -23,28 +41,29 @@ class JournalController extends Controller
             'mentions' => 'nullable|array',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240'
         ]);
-    
-        // Calculate read time
+
+        $user = $request->user();
+
         $wordCount = str_word_count($request->input('content'));
-        $wordsPerMinute = 200; // Average reading speed
-        $readTimeMinutes = ceil($wordCount / $wordsPerMinute);
+        $readTimeMinutes = ceil($wordCount / 200);
         $formattedReadTime = $readTimeMinutes . ' min read';
 
         $journal = new Journal($request->except(['images']));
-        $journal->read_time = $formattedReadTime; // Add read time to the journal
+        $journal->account_id = $request->user()->id;
+        $journal->read_time = $formattedReadTime;
+        $journal->account_id = $user->id;
 
         $imagePaths = [];
-    
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $img) {
-                $path = $img->store('uploads', 'public'); // stored in storage/app/public/uploads
+                $path = $img->store('uploads', 'public');
                 $imagePaths[] = 'storage/' . $path;
             }
         }
 
-        $journal->images = json_encode($imagePaths); // Store image paths as JSON
+        $journal->images = json_encode($imagePaths);
         $journal->save();
-    
+
         return response()->json([
             'message' => 'Journal saved successfully!',
             'data' => $journal
@@ -53,7 +72,7 @@ class JournalController extends Controller
 
     public function show($id)
     {
-        $journal = Journal::findOrFail($id);
+        $journal = Journal::with('account')->findOrFail($id);
 
         return response()->json($journal);
     }
@@ -61,6 +80,11 @@ class JournalController extends Controller
     public function update(Request $request, $id)
     {
         $journal = Journal::findOrFail($id);
+
+        // Check ownership
+        if ($request->user()->id !== $journal->account_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         $request->validate([
             'title' => 'required|string',
@@ -70,10 +94,8 @@ class JournalController extends Controller
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240'
         ]);
 
-        // Calculate read time
         $wordCount = str_word_count($request->input('content'));
-        $wordsPerMinute = 200; // Average reading speed
-        $readTimeMinutes = ceil($wordCount / $wordsPerMinute);
+        $readTimeMinutes = ceil($wordCount / 200);
         $formattedReadTime = $readTimeMinutes . ' min read';
 
         $journal->fill($request->except(['images']));
@@ -96,9 +118,16 @@ class JournalController extends Controller
         ], 200);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        Journal::destroy($id);
+        $journal = Journal::findOrFail($id);
+
+        // Check ownership
+        if ($request->user()->id !== $journal->account_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $journal->delete();
 
         return response()->json(['message' => 'Journal deleted successfully!'], 200);
     }

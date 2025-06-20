@@ -6,6 +6,7 @@ use App\Http\Controllers\HotelController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\JournalController;
 
+
 Route::controller(HotelController::class)->prefix('hotels')->group(function () {
     Route::get('/', 'index');
     Route::post('/', 'store');
@@ -39,5 +40,13 @@ Route::post('/reset-password', [AccountController::class, 'resetPassword']);
 Route::get('/journals', [JournalController::class, 'index']);
 Route::post('/journals', [JournalController::class, 'store']);
 Route::get('/journals/{id}', [JournalController::class, 'show']);
+
+Route::middleware('auth:sanctum')->get('/profile', [AccountController::class, 'profile']);
+Route::middleware('auth:sanctum')->put('/profile', [AccountController::class, 'updateProfile']);
+Route::middleware('auth:sanctum')->delete('/profile', [AccountController::class, 'deleteProfile']);
+Route::middleware('auth:sanctum')->post('/profile/upload-image', [AccountController::class, 'uploadImage']);
+Route::middleware('auth:sanctum')->post('/profile/featured-photo', [AccountController::class, 'uploadFeaturedPhoto']);
+
+Route::middleware('auth:sanctum')->post('/journals', [JournalController::class, 'store']);
 
 
