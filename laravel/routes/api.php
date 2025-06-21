@@ -40,6 +40,7 @@ Route::post('/reset-password', [AccountController::class, 'resetPassword']);
 Route::get('/journals', [JournalController::class, 'index']);
 Route::post('/journals', [JournalController::class, 'store']);
 Route::get('/journals/{id}', [JournalController::class, 'show']);
+Route::delete('/journals/{id}', [JournalController::class, 'destroy']);
 
 Route::middleware('auth:sanctum')->get('/profile', [AccountController::class, 'profile']);
 Route::middleware('auth:sanctum')->put('/profile', [AccountController::class, 'updateProfile']);

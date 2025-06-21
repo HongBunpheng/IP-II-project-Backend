@@ -70,12 +70,15 @@ class JournalController extends Controller
         ], 201);
     }
 
-    public function show($id)
-    {
-        $journal = Journal::with('account')->findOrFail($id);
-
+public function show($id)
+{
+    try {
+        $journal = Journal::findOrFail($id);
         return response()->json($journal);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Journal not found'], 404);
     }
+}
 
     public function update(Request $request, $id)
     {
@@ -118,17 +121,15 @@ class JournalController extends Controller
         ], 200);
     }
 
-    public function destroy(Request $request, $id)
-    {
+public function destroy($id)
+{
+    try {
         $journal = Journal::findOrFail($id);
-
-        // Check ownership
-        if ($request->user()->id !== $journal->account_id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         $journal->delete();
-
-        return response()->json(['message' => 'Journal deleted successfully!'], 200);
+        return response()->json(['message' => 'Deleted successfully']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Delete failed'], 500);
     }
+}
+
 }
