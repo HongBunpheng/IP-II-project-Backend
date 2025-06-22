@@ -5,6 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\JournalController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\TransportationController;
+use App\Http\Controllers\PlaceController;
+use App\Http\Controllers\SavedPlaceController;
+use App\Http\Controllers\SearchPlaceController;
 
 
 Route::controller(HotelController::class)->prefix('hotels')->group(function () {
@@ -49,4 +54,28 @@ Route::middleware('auth:sanctum')->post('/profile/featured-photo', [AccountContr
 
 Route::middleware('auth:sanctum')->post('/journals', [JournalController::class, 'store']);
 
+Route::get('/reviews', [ReviewController::class, 'index']);
+Route::post('/reviews', [ReviewController::class, 'store']);
+
+
+Route::controller(TransportationController::class)->prefix('transportations')->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+    Route::get('/{transportation}', 'show');
+    Route::put('/{transportation}', 'update');
+    Route::delete('/{transportation}', 'destroy');
+});
+
+// Place routes
+Route::get('/places', [PlaceController::class, 'index']);
+Route::post('/places', [PlaceController::class, 'store']);
+
+// Saved places routes
+Route::post('/save', [SavedPlaceController::class, 'store']);
+Route::delete('/save/{place_id}', [SavedPlaceController::class, 'destroy']);
+Route::get('/saved/{user_id}', [SavedPlaceController::class, 'getUserSaved']);
+
+// Search places
+Route::get('/places', [SearchPlaceController::class, 'index']);   // Search places
+Route::post('/places', [SearchPlaceController::class, 'store']);  // Create place
 

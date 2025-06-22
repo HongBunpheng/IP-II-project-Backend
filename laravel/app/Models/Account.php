@@ -39,9 +39,14 @@ class Account extends Authenticatable
         'reset_code',
         'reset_code_expires_at',
     ];
-    
+
     public function journals()
     {
         return $this->hasMany(Journal::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

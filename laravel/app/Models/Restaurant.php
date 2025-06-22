@@ -28,4 +28,9 @@ class Restaurant extends Model
         'rating' => 'decimal:2',
         'price' => 'decimal:2',
     ];
+
+    public function reviews()
+    {
+        return $this->morphMany(Review::class, 'reviewable');
+    }
 }
