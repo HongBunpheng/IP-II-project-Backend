@@ -50,4 +50,3 @@ Route::middleware('auth:sanctum')->post('/profile/featured-photo', [AccountContr
 
 Route::middleware('auth:sanctum')->post('/journals', [JournalController::class, 'store']);
 
-
