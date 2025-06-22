@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\JournalController;
+use App\Http\Controllers\TransportationController;
+
 
 
 Route::controller(HotelController::class)->prefix('hotels')->group(function () {
@@ -48,5 +50,14 @@ Route::middleware('auth:sanctum')->post('/profile/upload-image', [AccountControl
 Route::middleware('auth:sanctum')->post('/profile/featured-photo', [AccountController::class, 'uploadFeaturedPhoto']);
 
 Route::middleware('auth:sanctum')->post('/journals', [JournalController::class, 'store']);
+
+Route::controller(TransportationController::class)->prefix('transportations')->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+    Route::get('/{transportation}', 'show');
+    Route::put('/{transportation}', 'update');
+    Route::delete('/{transportation}', 'destroy');
+});
+
 
 
