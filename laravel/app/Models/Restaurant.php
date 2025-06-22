@@ -23,9 +23,10 @@ class Restaurant extends Model
     ];
 
     protected $casts = [
-        'image' => 'array',
-        'detail_image' => 'array',
-        'rating' => 'decimal:2',
-        'price' => 'decimal:2',
-    ];
+    'image' => 'array',
+    'detail_image' => 'array',
+    'rating' => 'decimal:2',
+    'price' => 'decimal:2',
+];
+
 }

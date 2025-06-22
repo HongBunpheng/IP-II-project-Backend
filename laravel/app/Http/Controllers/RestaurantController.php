@@ -27,71 +27,69 @@ class RestaurantController extends Controller
             'detail_image.*' => 'nullable|image',
         ]);
 
-        $hotel = new Restaurant($request->except(['image', 'detail_image']));
+        $restaurant = new Restaurant($request->except(['image', 'detail_image']));
 
-        // Handle image array
-        $imagePaths = [];
+        // Store main images
         if ($request->hasFile('image')) {
+            $imagePaths = [];
             foreach ($request->file('image') as $img) {
                 $imagePaths[] = $img->store('uploads', 'public');
             }
+            $restaurant->image = $imagePaths;
         }
-        $hotel->image = $imagePaths;
 
-        // Handle detail image array
-        $detailImagePaths = [];
+        // Store detail images
         if ($request->hasFile('detail_image')) {
+            $detailImagePaths = [];
             foreach ($request->file('detail_image') as $img) {
                 $detailImagePaths[] = $img->store('uploads', 'public');
             }
+            $restaurant->detail_image = $detailImagePaths;
         }
-        $hotel->detail_image = $detailImagePaths;
 
-        $hotel->save();
+        $restaurant->save();
 
-        return response()->json(['message' => 'Hotel saved', 'hotel' => $hotel], 201);
+        return response()->json(['message' => 'Restaurant saved', 'restaurant' => $restaurant], 201);
     }
 
-    public function show(Restaurant $hotel)
+    public function show(Restaurant $restaurant)
     {
-        return response()->json($hotel);
+        return response()->json($restaurant);
     }
 
-    public function update(Request $request, Restaurant $hotel)
+    public function update(Request $request, Restaurant $restaurant)
     {
         $request->validate([
             'image.*' => 'nullable|image',
             'detail_image.*' => 'nullable|image',
         ]);
 
-        $hotel->fill($request->except(['image', 'detail_image']));
+        $restaurant->fill($request->except(['image', 'detail_image']));
 
-        // Update image array
         if ($request->hasFile('image')) {
             $imagePaths = [];
             foreach ($request->file('image') as $img) {
                 $imagePaths[] = $img->store('uploads', 'public');
             }
-            $hotel->image = $imagePaths;
+            $restaurant->image = $imagePaths;
         }
 
-        // Update detail image array
         if ($request->hasFile('detail_image')) {
             $detailImagePaths = [];
             foreach ($request->file('detail_image') as $img) {
                 $detailImagePaths[] = $img->store('uploads', 'public');
             }
-            $hotel->detail_image = $detailImagePaths;
+            $restaurant->detail_image = $detailImagePaths;
         }
 
-        $hotel->save();
+        $restaurant->save();
 
-        return response()->json($hotel);
+        return response()->json($restaurant);
     }
 
-    public function destroy(Restaurant $hotel)
+    public function destroy(Restaurant $restaurant)
     {
-        $hotel->delete();
+        $restaurant->delete();
         return response()->json(null, 204);
     }
 }
