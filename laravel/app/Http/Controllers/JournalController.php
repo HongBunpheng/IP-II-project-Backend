@@ -72,13 +72,30 @@ class JournalController extends Controller
 
 public function show($id)
 {
-    try {
-        $journal = Journal::findOrFail($id);
-        return response()->json($journal);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Journal not found'], 404);
+    $journal = Journal::with('account')->find($id);
+
+    if (!$journal) {
+        return response()->json(['message' => 'Journal not found'], 404);
     }
+
+    return response()->json([
+        'id' => $journal->id,
+        'title' => $journal->title,
+        'content' => $journal->content,
+        'location' => $journal->location,
+        'images' => json_decode($journal->images, true),
+        'mentions' => json_decode($journal->mentions, true),
+        'read_time' => $journal->read_time,
+        'created_at' => $journal->created_at,
+        'account' => [
+            'name' => $journal->account->name ?? 'Unknown',
+            'profile_picture' => $journal->account->profile_picture
+                ? asset('storage/' . $journal->account->profile_picture)
+                : null
+        ]
+    ]);
 }
+
 
     public function update(Request $request, $id)
     {

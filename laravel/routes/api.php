@@ -49,4 +49,4 @@ Route::middleware('auth:sanctum')->post('/profile/upload-image', [AccountControl
 Route::middleware('auth:sanctum')->post('/profile/featured-photo', [AccountController::class, 'uploadFeaturedPhoto']);
 
 Route::middleware('auth:sanctum')->post('/journals', [JournalController::class, 'store']);
-
+Route::middleware('auth:sanctum')->put('/journals/{id}', [JournalController::class, 'update']);
