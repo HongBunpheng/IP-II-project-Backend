@@ -9,14 +9,15 @@ class SavedPlace extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'place_id',
-    ];
+    protected $fillable = ['account_id', 'saveable_id', 'saveable_type'];
 
-    // Include Place relationship
-    public function place()
+    public function saveable()
     {
-        return $this->belongsTo(Place::class);
+        return $this->morphTo();
+    }
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
     }
 }

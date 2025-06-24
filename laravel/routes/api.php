@@ -71,9 +71,10 @@ Route::get('/places', [PlaceController::class, 'index']);
 Route::post('/places', [PlaceController::class, 'store']);
 
 // Saved places routes
-Route::post('/save', [SavedPlaceController::class, 'store']);
-Route::delete('/save/{place_id}', [SavedPlaceController::class, 'destroy']);
-Route::get('/saved/{user_id}', [SavedPlaceController::class, 'getUserSaved']);
+Route::post('/saved-places', [SavedPlaceController::class, 'store']);
+Route::delete('/saved-places/{saveable_id}/{saveable_type}', [SavedPlaceController::class, 'destroy']);
+Route::get('/saved-places/user/{account_id}', [SavedPlaceController::class, 'getUserSaved']);
+
 
 // Search places
 Route::get('/places', [SearchPlaceController::class, 'index']);   // Search places

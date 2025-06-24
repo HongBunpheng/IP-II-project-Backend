@@ -13,13 +13,12 @@ return new class extends Migration
     {
         Schema::create('saved_places', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('place_id')->constrained()->onDelete('cascade');
+            $table->foreignId('account_id')->constrained('accounts')->onDelete('cascade');
+            $table->unsignedBigInteger('saveable_id');
+            $table->string('saveable_type'); // App\Models\Hotel, etc.
             $table->timestamps();
-});
-
+        });
     }
-
     /**
      * Reverse the migrations.
      */

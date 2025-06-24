@@ -7,20 +7,29 @@ use Illuminate\Http\Request;
 
 class SavedPlaceController extends Controller
 {
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $saved = SavedPlace::firstOrCreate([
-            'user_id' => $request->user_id,
-            'place_id' => $request->place_id,
+            'account_id' => $request->account_id,
+            'saveable_id' => $request->saveable_id,
+            'saveable_type' => $request->saveable_type,
         ]);
-        return response()->json($saved);
+        return response()->json($saved->load('saveable'));
     }
 
-    public function destroy($place_id) {
-        SavedPlace::where('place_id', $place_id)->delete();
+    public function destroy(Request $request)
+    {
+        SavedPlace::where([
+            'saveable_id' => $request->saveable_id,
+            'saveable_type' => $request->saveable_type,
+        ])->delete();
+
         return response()->json(['message' => 'Unsave successful']);
     }
 
-    public function getUserSaved($user_id) {
-        return SavedPlace::with('place')->where('user_id', $user_id)->get();
+
+    public function getUserSaved($account_id)
+    {
+        return SavedPlace::with('saveable')->where('account_id', $account_id)->get();
     }
 }
