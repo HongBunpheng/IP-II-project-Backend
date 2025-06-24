@@ -90,7 +90,9 @@ class JournalController extends Controller
             'account' => [
                 'name' => $journal->account->name ?? 'Unknown',
                 'profile_picture' => $journal->account->profile_picture
-                    ? asset('storage/' . $journal->account->profile_picture)
+                    ? (str_starts_with($journal->account->profile_picture, 'http')
+                        ? $journal->account->profile_picture
+                        : asset($journal->account->profile_picture))
                     : null
             ]
         ]);
